@@ -66,7 +66,7 @@ function App() {
   };
 
   return (
-    <>
+    <div className="Container">
       <h1>
         Multiple object detection using pre trained model in TensorFlow.js
       </h1>
@@ -88,11 +88,10 @@ function App() {
           <button id="webcamButton" onClick={enableCam}>
             Enable Webcam
           </button>
-          <video id="webcam" autoPlay muted width="640" height="640"></video>
-          <canvas id="frame-canvas" style={{ display: "none" }}></canvas>
+          <video id="webcam" autoPlay muted></video>
         </div>
       </section>
-    </>
+    </div>
   );
 }
 

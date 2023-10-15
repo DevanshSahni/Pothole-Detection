@@ -1,0 +1,18 @@
+.Container {
+  margin: 50px;
+}
+
+#webcam {
+  margin: auto;
+}
+
+#webcamButton {
+  width: 150px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.camView {
+  display: flex;
+  flex-direction: column;
+}
