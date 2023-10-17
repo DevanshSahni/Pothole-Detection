@@ -1,6 +1,7 @@
 import "./App.css";
 
 function App() {
+  let intervalID;
   function getUserMediaSupported() {
     return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   }
@@ -24,12 +25,12 @@ function App() {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
       video.srcObject = stream;
       await video.play();
-
-      // Ensure the video is playing before attempting to capture a frame
-      video.onplaying = async () => {
-        console.log("Here");
-        await getPrediction();
-      };
+        
+      intervalID=setInterval(async()=>{
+        console.log("Here")
+        await getPrediction()
+      }, 3000);
+      
     } catch (err) {
       console.error("Error accessing webcam: ", err);
     }
@@ -47,7 +48,7 @@ function App() {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       // Convert the canvas content to a JPEG image
-      const image = canvas.toDataURL("image/jpeg");
+      const image = canvas.toDataURL("image/jpeg"); 
 
       //Send the 'image' data to server for further processing.
       const response = await fetch("http://localhost:3001/prediction", {
@@ -64,6 +65,9 @@ function App() {
       console.log(data.output);
     };
   };
+  const stopTracking= ()=>{
+    clearInterval(intervalID);
+  }
 
   return (
     <div className="Container">
@@ -85,9 +89,13 @@ function App() {
         </p>
 
         <div id="liveView" className="camView">
+          <div>
           <button id="webcamButton" onClick={enableCam}>
-            Enable Webcam
+            Start Tracking
           </button>
+          <button id="webcamButton" onClick={stopTracking}>
+            Stop Tracking
+          </button></div>
           <video id="webcam" autoPlay muted></video>
         </div>
       </section>
