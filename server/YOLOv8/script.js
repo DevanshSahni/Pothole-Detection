@@ -61,13 +61,20 @@ function postprocess(output, imgWidth, imgHeight) {
     const x2 = ((xCenter + width / 2) / 640) * imgWidth;
     const y2 = ((yCenter + height / 2) / 640) * imgHeight;
 
+    const x3 = ((xCenter - width / 2) / 640) * imgWidth;
+    const y3 = ((yCenter + height / 2) / 640) * imgHeight;
+    const x4 = ((xCenter + width / 2) / 640) * imgWidth;
+    const y4 = ((yCenter - height / 2) / 640) * imgHeight;
+
     if (probability > 0.5) {
-      boxes.push([x1, x2, y1, y2, probability]);
+      boxes.push([x1, x2, y1, y2, x3, y3, x4, y4, probability]);
     }
   }
 
   const threshold = 0.7; // Adjust the threshold as needed
   const selectedBoxes = nonMaxSuppression(boxes, threshold);
+
+  console.log(boxes);
 
   return selectedBoxes.length;
 }
@@ -85,7 +92,7 @@ function nonMaxSuppression(boxes, threshold) {
       if (iou >= threshold) {
         // If the IoU is greater than or equal to the threshold, keep only one box with higher probability
         includeBox = false;
-        if (resultBoxes[j][4] > boxes[i][4]) {
+        if (resultBoxes[j][8] > boxes[i][8]) {
           resultBoxes[j] = boxes[i];
         }
         break;
