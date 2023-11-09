@@ -1,6 +1,9 @@
+import React, { useRef } from "react";
 import "./App.css";
 
 function App() {
+  const canvasRef = useRef(null);
+
   let intervalID;
   function getUserMediaSupported() {
     return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -25,30 +28,33 @@ function App() {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
       video.srcObject = stream;
       await video.play();
-        
-      intervalID=setInterval(async()=>{
-        console.log("Here")
-        await getPrediction()
-      }, 3000);
-      
+
+      intervalID = setInterval(async () => {
+        console.log("Here");
+        await getPrediction();
+      }, 1000);
     } catch (err) {
       console.error("Error accessing webcam: ", err);
     }
 
-    const getPrediction = async () => {
+    const getPrediction = async (timestamp) => {
       // Create a canvas element to capture frames
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
+      const hiddencanvas = document.createElement("canvas");
+      const hiddenctx = hiddencanvas.getContext("2d");
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
 
       // Set canvas dimensions to match the video stream
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+      hiddencanvas.width = video.videoWidth;
+      hiddencanvas.height = video.videoHeight;
 
       // Draw the video frame on the canvas
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      hiddenctx.drawImage(video, 0, 0, hiddencanvas.width, hiddencanvas.height);
 
       // Convert the canvas content to a JPEG image
-      const image = canvas.toDataURL("image/jpeg"); 
+      const image = hiddencanvas.toDataURL("image/jpeg");
 
       //Send the 'image' data to server for further processing.
       const response = await fetch("http://localhost:3001/prediction", {
@@ -62,12 +68,22 @@ function App() {
         },
       });
       const data = await response.json();
-      console.log(data.output);
+      console.log(data);
+
+      // Draw the bounding boxes for the detected potholes
+      data.forEach((pothole) => {
+        const [x1, x2, y1, y2] = pothole;
+        ctx.beginPath();
+        ctx.rect(x1, y1, x2 - x1, y2 - y1);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "red";
+        ctx.stroke();
+      });
     };
   };
-  const stopTracking= ()=>{
+  const stopTracking = () => {
     clearInterval(intervalID);
-  }
+  };
 
   return (
     <div className="Container">
@@ -90,12 +106,14 @@ function App() {
 
         <div id="liveView" className="camView">
           <div>
-          <button id="webcamButton" onClick={enableCam}>
-            Start Tracking
-          </button>
-          <button id="webcamButton" onClick={stopTracking}>
-            Stop Tracking
-          </button></div>
+            <button id="webcamButton" onClick={enableCam}>
+              Start Tracking
+            </button>
+            <button id="webcamButton" onClick={stopTracking}>
+              Stop Tracking
+            </button>
+          </div>
+          <canvas className="canvas" ref={canvasRef} />
           <video id="webcam" autoPlay muted></video>
         </div>
       </section>
