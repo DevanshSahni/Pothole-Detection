@@ -18,6 +18,10 @@ app.use(
 
 app.post("/prediction", async (req, res) => {
   const frame = req.body.image;
+  const longitude = req.body.longitude;
+  const latitude = req.body.latitude;
+  console.log("longitude: " + longitude);
+  console.log("latitude: " + latitude);
   res.send({ output: await loadModel(frame) });
 });
 
