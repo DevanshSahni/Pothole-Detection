@@ -2,17 +2,37 @@ import "./App.css";
 
 function App() {
   let intervalID;
-  function getUserMediaSupported() {
-    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  let latitude, longitude;
+  const getUserMediaSupported = async() =>{
+    try {
+      await navigator.mediaDevices.getUserMedia({video:true,});
+      return true;
+    } catch (error) {
+      alert(error);
+      return false;
+    }
   }
 
   const enableCam = async (event) => {
     const video = document.getElementById("webcam");
 
-    if (getUserMediaSupported()) {
+    if (await getUserMediaSupported()) {
       console.log("getUserMedia is supported");
     } else {
       console.log("getUserMedia is not supported");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition((pos)=>{
+      latitude= pos.coords.latitude;
+      longitude=pos.coords.longitude;
+    }, (err)=>{
+      alert(err);
+      return;
+    });
+    
+    if(!(latitude && longitude)){
+      console.log('Location not accessed');
       return;
     }
 
@@ -56,6 +76,8 @@ function App() {
         credentials: "include",
         body: JSON.stringify({
           image: image,
+          latitude: latitude,
+          longitude: longitude,
         }),
         headers: {
           "Content-Type": "application/json",
