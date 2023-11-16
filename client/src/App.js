@@ -21,9 +21,7 @@ function App() {
 
   const enableCam = async () => {
     setStartButton(false);
-    const video = document.getElementById("webcam");
     document.getElementById("webcam").style.display="block";
-
     if (await getUserMediaSupported()) {
       console.log("getUserMedia is supported");
     } else {
@@ -34,16 +32,16 @@ function App() {
     navigator.geolocation.getCurrentPosition((pos)=>{
       latitude= pos.coords.latitude;
       longitude=pos.coords.longitude;
+      sendFrame();
     }, (err)=>{
       alert(err);
       return;
     });
-    
-    if(!(latitude && longitude)){
-      console.log('Location not accessed');
-      return;
-    }
+  }
 
+  const sendFrame=async(event)=>{
+    
+    const video = document.getElementById("webcam");
     const constraints = {
       video: true,
     };
