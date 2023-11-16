@@ -1,19 +1,28 @@
 const express = require("express");
 const { loadModel } = require("./YOLOv8/script");
 const cors = require("cors");
-const bodyParser = require("body-parser");
+const mongoose=require("mongoose");
+const bodyParser = require('body-parser');
+const Pothole = require("./models/Pothole")
+
 
 const app = express();
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
 // app.use(express.json());
 
-app.use(
+require("dotenv").config();
+
+
+app.use( 
+
   cors({
     origin: true,
-    credentials: true,
+    credentials: true, 
   })
-);
+);  
+
+mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.rnblsxi.mongodb.net/potholes`);
 
 app.post("/prediction", async (req, res) => {
   const frame = req.body.image;
@@ -21,10 +30,23 @@ app.post("/prediction", async (req, res) => {
   const latitude = req.body.latitude;
   console.log("longitude: " + longitude);
   console.log("latitude: " + latitude);
-  const coordinates = await loadModel(frame);
-  res.send(coordinates);
+  // res.send({ output: await loadModel(frame) });
+
+  const potholeData = await loadModel(frame);
+
+  const newPotholeEntry = new Pothole({
+    latitude,
+    longitude,
+    numberOfPotholes: potholeData, //  the number of potholes detected
+  });
+
+  await newPotholeEntry.save(); 
+
+  res.send({ output: potholeData });
+
 });
 
 app.listen(3001, () => {
-  console.log("Server started");
+  console.log("Server started"); 
 });
+ 

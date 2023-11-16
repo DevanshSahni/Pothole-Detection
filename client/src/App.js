@@ -1,9 +1,9 @@
 import "./index.css";
 import { useState, useRef } from "react";
 function App() {
+  let intervalID;
   const canvasRef = useRef(null);
 
-  let intervalID;
   const intervalIDRef = useRef(null);
   const mediaStreamRef = useRef(null);
   const [startButton, setStartButton] = useState(true);
