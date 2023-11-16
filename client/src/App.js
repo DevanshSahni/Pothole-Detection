@@ -1,15 +1,22 @@
 import "./index.css";
 import {useState, useRef} from "react"
 function App() {
-  // let intervalID=null; 
+  
+  let intervalID;
   const intervalIDRef = useRef(null);
   const mediaStreamRef = useRef(null);
   const [startButton,setStartButton]=useState(true);
   const [numberOfPothole, setNumberOfPotholes] = useState(0);
   const [loading,setLoading]= useState(false);
-
-  function getUserMediaSupported() {
-    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  let latitude, longitude;
+  const getUserMediaSupported = async() =>{
+    try {
+      await navigator.mediaDevices.getUserMedia({video:true,});
+      return true;
+    } catch (error) {
+      alert(error);
+      return false;
+    }
   }
 
   const enableCam = async () => {
@@ -17,10 +24,23 @@ function App() {
     const video = document.getElementById("webcam");
     document.getElementById("webcam").style.display="block";
 
-    if (getUserMediaSupported()) {
+    if (await getUserMediaSupported()) {
       console.log("getUserMedia is supported");
     } else {
       console.log("getUserMedia is not supported");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition((pos)=>{
+      latitude= pos.coords.latitude;
+      longitude=pos.coords.longitude;
+    }, (err)=>{
+      alert(err);
+      return;
+    });
+    
+    if(!(latitude && longitude)){
+      console.log('Location not accessed');
       return;
     }
 
@@ -66,6 +86,8 @@ function App() {
         credentials: "include",
         body: JSON.stringify({
           image: image,
+          latitude: latitude,
+          longitude: longitude,
         }),
         headers: {
           "Content-Type": "application/json",
