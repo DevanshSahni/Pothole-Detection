@@ -5,15 +5,17 @@ const mongoose=require("mongoose");
 const bodyParser = require('body-parser');
 const Pothole = require("./models/Pothole")
 
+
 const app = express();
-app.use(bodyParser.json({ limit: '10mb' })); 
-app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: "10mb" }));
+app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
 // app.use(express.json());
 
 require("dotenv").config();
 
 
 app.use( 
+
   cors({
     origin: true,
     credentials: true, 
@@ -41,6 +43,7 @@ app.post("/prediction", async (req, res) => {
   await newPotholeEntry.save(); 
 
   res.send({ output: potholeData });
+
 });
 
 app.listen(3001, () => {

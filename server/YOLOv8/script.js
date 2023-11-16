@@ -11,7 +11,7 @@ async function loadModel(frame) {
 }
 
 // Preprocess the image/frame
-async function preprocessImage(image, imgWidth, imgHeight) {
+async function preprocessImage(image) {
   // Decode image data
   const base64Data = image.replace(/^data:image\/jpeg;base64,/, "");
   const imageBuffer = Buffer.from(base64Data, "base64");
@@ -19,22 +19,20 @@ async function preprocessImage(image, imgWidth, imgHeight) {
   // to extract the original metadata of input image
   const img = sharp(imageBuffer);
   const metaData = await img.metadata();
-  imgWidth = metaData.width;
-  imgHeight = metaData.height;
+  let imgWidth = metaData.width;
+  let imgHeight = metaData.height;
 
   // Process the image
   const resizedImage = await sharp(imageBuffer).resize(640, 640).toBuffer();
   const imageTensor = tf.node.decodeImage(resizedImage);
   const normalizedTensor = imageTensor.div(tf.scalar(255));
   const expandedTensor = normalizedTensor.expandDims(0);
-  return expandedTensor;
+  return [expandedTensor, imgWidth, imgHeight];
 }
 
 // Predict if given image has Potholes.
 async function predict(image) {
-  let imgWidth, imgHeight;
-  const inputTensor = await preprocessImage(image, imgWidth, imgHeight);
-
+  const [inputTensor, imgWidth, imgHeight] = await preprocessImage(image);
   // Perform inference (prediction)
   const outputTensor = await model.execute(inputTensor);
   const tensorArray = await outputTensor.array();
@@ -73,10 +71,7 @@ function postprocess(output, imgWidth, imgHeight) {
 
   const threshold = 0.7; // Adjust the threshold as needed
   const selectedBoxes = nonMaxSuppression(boxes, threshold);
-
-  console.log(boxes);
-
-  return selectedBoxes.length;
+  return selectedBoxes;
 }
 
 // Return the remaining boxes after performing suppression
