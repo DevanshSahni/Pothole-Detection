@@ -2,7 +2,7 @@ import "./index.css";
 import {useState, useRef} from "react"
 function App() {
   
-  let intervalID;
+  // let intervalID;
   const intervalIDRef = useRef(null);
   const mediaStreamRef = useRef(null);
   const [startButton,setStartButton]=useState(true);
