@@ -7,7 +7,7 @@ let model;
 // Load the custom trained model in tensorflow.js
 async function loadModel(frame) {
   model = await tf.loadGraphModel(`file://${modelPath}`);
-  return (await predict(frame)) + " potholes detected!";
+  return (await predict(frame));
 }
 
 // Preprocess the image/frame
