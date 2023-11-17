@@ -48,7 +48,6 @@ function App() {
     };
 
     try {
-      // stream = await navigator.mediaDevices.getUserMedia(constraints);
       mediaStreamRef.current = await navigator.mediaDevices.getUserMedia(
         constraints
       );
