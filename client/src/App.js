@@ -1,13 +1,11 @@
 import "./index.css";
 import { useState, useRef } from "react";
 function App() {
-  let intervalID;
   const canvasRef = useRef(null);
-
   const intervalIDRef = useRef(null);
   const mediaStreamRef = useRef(null);
   const [startButton, setStartButton] = useState(true);
-  const [numberOfPothole, setNumberOfPotholes] = useState(0);
+  const [detection,setDetection] = useState(false);
   const [loading, setLoading] = useState(false);
   let latitude, longitude;
   const getUserMediaSupported = async () => {
@@ -50,7 +48,6 @@ function App() {
     };
 
     try {
-      // stream = await navigator.mediaDevices.getUserMedia(constraints);
       mediaStreamRef.current = await navigator.mediaDevices.getUserMedia(
         constraints
       );
@@ -100,8 +97,7 @@ function App() {
         },
       });
       const data = await response.json();
-      console.log(data);
-
+      console.log(await data.length);
       // Draw the bounding boxes for the detected potholes
       data.forEach((pothole) => {
         const [x1, x2, y1, y2] = pothole;
@@ -111,47 +107,27 @@ function App() {
         ctx.strokeStyle = "red";
         ctx.stroke();
       });
-      setNumberOfPotholes(data.output);
+      if(data.length>0)
+      {
+        stopTracking();
+      }
     };
   };
   const stopTracking = () => {
-    clearInterval(intervalID);
+    clearInterval(intervalIDRef.current);
+    setLoading(false);
+    setDetection(true);
   };
 
   return (
     <div className="Container">
       <h1>Smart Pothole Detection</h1>
-      <p>
-        Click on the button below to start detecting the potholes and report
-        them to nearest administration center
-      </p>
-      <div id="liveView" className={startButton ? "camNotInView" : "camInView"}>
-        <canvas className="canvas" ref={canvasRef} />
-        <video
-          id="webcam"
-          autoPlay
-          muted
-          className={startButton ? "hideButton" : "videoView"}
-        ></video>
-        <button
-          id="webcamButton"
-          className={startButton ? "webButton" : "hideButton"}
-          onClick={enableCam}
-        >
-          Start Tracking
-        </button>
-        {loading && (
-          <>
-            <p>Potholes Detected : {numberOfPothole}</p>
-            <button
-              id="webcamButton"
-              className="webButton"
-              onClick={stopTracking}
-            >
-              Stop Tracking
-            </button>
-          </>
-        )}
+      <p className={detection && "hideDisplay"}>Click on the button below to start detecting the potholes and reportthem to nearest administration center</p>
+      <div className={startButton ? "camNotInView" : "camInView"}>
+        <canvas className={loading ? "canvas": "hideDisplay"} ref={canvasRef} />
+        <video id="webcam" autoPlay muted className={detection ? "hideDisplay" : "videoView"}></video>
+        <p className={!detection && "hideDisplay" }>Potholes have been detected and reported to the nearest administration center. Thankyou for your time.</p>
+        <button className={startButton ? "webButton" : "hideDisplay"} onClick={enableCam}>Start Tracking</button>
       </div>
     </div>
   );

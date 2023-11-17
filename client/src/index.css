@@ -16,25 +16,21 @@ code {
   flex-direction: column;
   height: 100vh;
   width: 40%;
-  min-width: 320px;
+  min-width: 350px;
   margin: auto;
   text-align: center;
 }
-.camNotInView {
+.camNotInView, .camInView {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
   height: 100vh;
   padding: 30px;
+  position: relative;
 }
 .camInView {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: space-between;
-  height: 100vh;
-  padding: 30px;
 }
 
 .webButton {
@@ -51,8 +47,8 @@ code {
   color: white;
   transition: ease-in-out 0.2s;
 }
-.hideButton {
-  display: none;
+.hideDisplay {
+  display: none !important;
 }
 
 .videoView {
@@ -63,22 +59,8 @@ code {
   position: absolute;
   margin-left: auto;
   margin-right: auto;
-  height: 346.88px;
-  width: 388.8px;
-  left: 0;
-  right: 0;
+  width: calc(100% - 60px);
+  height: calc(60% - 40px);
   z-index: 9;
-  top: 0;
-}
-#webcam {
-  position: absolute;
-  margin-left: auto;
-  margin-right: auto;
-  left: 0;
-  right: 0;
-  z-index: 8;
-  top: 0;
-}
-#liveView {
-  position: relative;
+  top: 30px;
 }
