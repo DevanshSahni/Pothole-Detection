@@ -79,12 +79,11 @@ function App() {
 
       // Draw the video frame on the canvas
       hiddenctx.drawImage(video, 0, 0, hiddencanvas.width, hiddencanvas.height);
-
       // Convert the canvas content to a JPEG image
       const image = hiddencanvas.toDataURL("image/jpeg");
 
       //Send the 'image' data to server for further processing.
-      const response = await fetch("http://localhost:3001/prediction", {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/prediction`, {
         method: "POST",
         credentials: "include",
         body: JSON.stringify({
@@ -98,24 +97,24 @@ function App() {
       });
       const data = await response.json();
       console.log(await data.length);
-      // Draw the bounding boxes for the detected potholes
-      data.forEach((pothole) => {
-        const [x1, x2, y1, y2] = pothole;
-        ctx.beginPath();
-        ctx.rect(x1, y1, x2 - x1, y2 - y1);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "red";
-        ctx.stroke();
-      });
       if(data.length>0)
       {
+        ctx.drawImage(video, 0, 0, hiddencanvas.width, hiddencanvas.height);
+        // Draw the bounding boxes for the detected potholes
+        data.forEach((pothole) => {
+          const [x1, x2, y1, y2] = pothole;
+          ctx.beginPath();
+          ctx.rect(x1, y1, x2 - x1, y2 - y1);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = "red";
+          ctx.stroke();
+        });
         stopTracking();
       }
     };
   };
   const stopTracking = () => {
     clearInterval(intervalIDRef.current);
-    setLoading(false);
     setDetection(true);
   };
 
@@ -126,7 +125,7 @@ function App() {
       <div className={startButton ? "camNotInView" : "camInView"}>
         <canvas className={loading ? "canvas": "hideDisplay"} ref={canvasRef} />
         <video id="webcam" autoPlay muted className={detection ? "hideDisplay" : "videoView"}></video>
-        <p className={!detection && "hideDisplay" }>Potholes have been detected and reported to the nearest administration center. Thankyou for your time.</p>
+        <p className={!detection ? "hideDisplay" : "displayText" }>Potholes have been detected and reported to the nearest administration center. Thankyou for your time.</p>
         <button className={startButton ? "webButton" : "hideDisplay"} onClick={enableCam}>Start Tracking</button>
       </div>
     </div>
