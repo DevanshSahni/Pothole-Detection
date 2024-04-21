@@ -15,7 +15,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-/* .Container {
+.Container {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -70,4 +70,4 @@ code {
 }
 .displayText{
   margin-top: 400px;
-} */
+}
