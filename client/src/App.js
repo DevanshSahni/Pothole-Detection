@@ -125,7 +125,7 @@ function App() {
       <div className={startButton ? "camNotInView" : "camInView"}>
         <canvas className={loading ? "canvas": "hideDisplay"} ref={canvasRef} />
         <video id="webcam" autoPlay muted className={detection ? "hideDisplay" : "videoView"}></video>
-        <p className={!detection ? "hideDisplay" : "displayText" }>Potholes have been detected and reported to the nearest administration center. Thankyou for your time.</p>
+        <p className={!detection ? "hideDisplay" : "displayText" }>Potholes have been detected and stored to the database. Thankyou for your time.</p>
         <button className={startButton ? "webButton" : "hideDisplay"} onClick={enableCam}>Start Tracking</button>
       </div>
     </div>

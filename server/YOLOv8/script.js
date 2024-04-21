@@ -27,6 +27,7 @@ async function preprocessImage(image) {
   const imageTensor = tf.node.decodeImage(resizedImage);
   const normalizedTensor = imageTensor.div(tf.scalar(255));
   const expandedTensor = normalizedTensor.expandDims(0);
+  
   return [expandedTensor, imgWidth, imgHeight];
 }
 
@@ -36,6 +37,7 @@ async function predict(image) {
   // Perform inference (prediction)
   const outputTensor = await model.execute(inputTensor);
   const tensorArray = await outputTensor.array();
+  console.log(tensorArray);
   const output = await tensorArray[0];
 
   return postprocess(output, imgWidth, imgHeight);

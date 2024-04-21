@@ -42,6 +42,15 @@ app.post("/prediction", async (req, res) => {
   res.send(coordinates);
 });
 
+app.get("/getPredictionData", async (req, res) => {
+  try {
+    const potholes = await Pothole.find();
+    res.status(200).json({ potholes });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server started");
 });
