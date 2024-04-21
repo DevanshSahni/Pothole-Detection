@@ -1,16 +1,21 @@
 import "../index.css";
 import { useState, useRef } from "react";
 
-import React from 'react'
+import React from "react";
 
 const Dashboard = () => {
-
   const canvasRef = useRef(null);
   const intervalIDRef = useRef(null);
   const mediaStreamRef = useRef(null);
   const [startButton, setStartButton] = useState(true);
   const [detection, setDetection] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [dataVisible, setDataVisible] = useState(false);
+  const [potholesNum, setPotholeNum] = useState(0);
+  const [lat, setLat] = useState(null);
+  const [long, setLong] = useState(null);
+
   let latitude, longitude;
   const getUserMediaSupported = async () => {
     try {
@@ -24,6 +29,8 @@ const Dashboard = () => {
 
   const enableCam = async () => {
     setStartButton(false);
+    setDetection(false);
+    // setLoading(false);
     document.getElementById("webcam").style.display = "block";
     if (await getUserMediaSupported()) {
       console.log("getUserMedia is supported");
@@ -35,7 +42,9 @@ const Dashboard = () => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         latitude = pos.coords.latitude;
+        setLat(latitude);
         longitude = pos.coords.longitude;
+        setLong(longitude);
         sendFrame();
       },
       (err) => {
@@ -43,6 +52,46 @@ const Dashboard = () => {
         return;
       }
     );
+  };
+
+  const addDB = async () => {
+    const video = document.getElementById("webcam");
+    const constraints = {
+      video: true,
+    };
+    const hiddencanvas = document.createElement("canvas");
+    const hiddenctx = hiddencanvas.getContext("2d");
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    // Set canvas dimensions to match the video stream
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    hiddencanvas.width = video.videoWidth;
+    hiddencanvas.height = video.videoHeight;
+
+    // Draw the video frame on the canvas
+    hiddenctx.drawImage(video, 0, 0, hiddencanvas.width, hiddencanvas.height);
+    // Convert the canvas content to a JPEG image
+    const image = hiddencanvas.toDataURL("image/jpeg");
+
+    const response = await fetch(`${process.env.REACT_APP_BASE_URL}/addtoDB`, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify({
+        image: image,
+        latitude: lat,
+        longitude: long,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    console.log(data);
+    setDataVisible(false);
+    alert("Data submitted successfully!");
   };
 
   const sendFrame = async (event) => {
@@ -61,7 +110,6 @@ const Dashboard = () => {
       setLoading(true);
 
       intervalIDRef.current = setInterval(async () => {
-        console.log("Here");
         await getPrediction();
       }, 3000);
     } catch (err) {
@@ -87,21 +135,27 @@ const Dashboard = () => {
       const image = hiddencanvas.toDataURL("image/jpeg");
 
       //Send the 'image' data to server for further processing.
-      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/prediction`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({
-          image: image,
-          latitude: latitude,
-          longitude: longitude,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/prediction`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: JSON.stringify({
+            image: image,
+            latitude: latitude,
+            longitude: longitude,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const data = await response.json();
+      const len = await data.length;
       console.log(await data.length);
+      setPotholeNum(len);
       if (data.length > 0) {
+        setDataVisible(true);
         ctx.drawImage(video, 0, 0, hiddencanvas.width, hiddencanvas.height);
         // Draw the bounding boxes for the detected potholes
         data.forEach((pothole) => {
@@ -124,15 +178,60 @@ const Dashboard = () => {
   return (
     <div className="Container">
       <h1 className="text-2xl">Smart Pothole Detection</h1>
-      <p className={detection && "hideDisplay"}>Click on the button below to start detecting the potholes and reportthem to nearest administration center</p>
+      <p className={detection && "hideDisplay"}>
+        Click on the button below to start detecting the potholes and reportthem
+        to nearest administration center
+      </p>
       <div className={startButton ? "camNotInView" : "camInView"}>
-        <canvas className={loading ? "canvas" : "hideDisplay"} ref={canvasRef} />
-        <video id="webcam" autoPlay muted className={detection ? "hideDisplay" : "videoView"}></video>
-        <p className={!detection ? "hideDisplay" : "displayText"}>Potholes have been detected and reported to the nearest administration center. Thankyou for your time.</p>
-        <button className={startButton ? "webButton" : "hideDisplay"} onClick={enableCam}>Start Tracking</button>
+        <canvas
+          className={loading ? "canvas" : "hideDisplay"}
+          ref={canvasRef}
+        />
+        <video
+          id="webcam"
+          autoPlay
+          muted
+          className={detection ? "hideDisplay" : "videoView"}
+        ></video>
+        <p className={!detection ? "hideDisplay" : "displayText"}>
+          Potholes have been detected and reported to the nearest administration
+          center. Thankyou for your time.
+        </p>
+        {dataVisible && (
+          <>
+            <p>Potholes Detected:-{potholesNum}</p>
+            <p>Latitude:- {lat}</p>
+            <p>Longitude:- {long}</p>
+          </>
+        )}
+
+        <button
+          className={startButton ? "webButton" : "hideDisplay"}
+          onClick={enableCam}
+        >
+          Start Tracking
+        </button>
+
+        {dataVisible && (
+          <div className="flex gap-5">
+            <button
+              onClick={() => {
+                // enableCam();
+                // setDataVisible(false);
+                window.location.reload();
+              }}
+              className="webButton"
+            >
+              Try Again
+            </button>
+            <button onClick={addDB} className="webButton">
+              Submit
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;

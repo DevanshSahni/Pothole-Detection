@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const potholeSchema = new mongoose.Schema({
   latitude: {
@@ -8,10 +8,13 @@ const potholeSchema = new mongoose.Schema({
   longitude: {
     type: Number,
     required: true,
-  }, 
+  },
   numberOfPotholes: {
     type: Number,
     required: true,
+  },
+  address: {
+    type: String,
   },
   timestamp: {
     type: Date,
@@ -19,6 +22,6 @@ const potholeSchema = new mongoose.Schema({
   },
 });
 
-const Pothole = mongoose.model('Pothole', potholeSchema);
+const Pothole = mongoose.model("Pothole", potholeSchema);
 
 module.exports = Pothole;

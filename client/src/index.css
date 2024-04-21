@@ -24,7 +24,8 @@ code {
   margin: auto;
   text-align: center;
 }
-.camNotInView, .camInView {
+.camNotInView,
+.camInView {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -68,6 +69,14 @@ code {
   z-index: 9;
   top: 30px;
 }
-.displayText{
+.displayText {
   margin-top: 400px;
+}
+.textFormat {
+  white-space: nowrap;
+  width: 155px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  color: #0077cc;
 }
