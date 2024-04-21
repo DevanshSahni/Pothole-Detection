@@ -122,7 +122,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="Container">
+    <div className="mt-40 Container ">
       <h1 className="text-2xl">Smart Pothole Detection</h1>
       <p className={detection && "hideDisplay"}>Click on the button below to start detecting the potholes and reportthem to nearest administration center</p>
       <div className={startButton ? "camNotInView" : "camInView"}>
