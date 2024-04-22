@@ -5,6 +5,7 @@ import Navbar from "./Components/Navbar";
 import Contact from "./Components/Contact";
 import PotholeData from "./Components/PotholeData";
 import ProofOfWork from "./Components/ProofOfWork";
+import Footer from "./Components/Footer";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/potholedata" element={<PotholeData />}></Route>
         <Route path="/proofofwork" element={<ProofOfWork />}></Route>
       </Routes>
+      <Footer />
     </>
   );
 };

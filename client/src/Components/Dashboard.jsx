@@ -177,8 +177,9 @@ const Dashboard = () => {
 
   return (
     <div className="Container">
-      <h1 className="text-2xl">Smart Pothole Detection</h1>
-      <p className={detection && "hideDisplay"}>
+      <h1 className="text-4xl mt-16 mb-3">Smart Pothole Detection</h1>
+      <hr className="border border-gray-700 " />
+      <p className={`mt-3 ${detection && "hideDisplay"}`}>
         Click on the button below to start detecting the potholes and reportthem
         to nearest administration center
       </p>
@@ -193,17 +194,20 @@ const Dashboard = () => {
           muted
           className={detection ? "hideDisplay" : "videoView"}
         ></video>
-        <p className={!detection ? "hideDisplay" : "displayText"}>
-          Potholes have been detected and reported to the nearest administration
-          center. Thankyou for your time.
-        </p>
-        {dataVisible && (
-          <>
-            <p>Potholes Detected:-{potholesNum}</p>
-            <p>Latitude:- {lat}</p>
-            <p>Longitude:- {long}</p>
-          </>
-        )}
+        <div>
+          <p className={!detection ? "hideDisplay" : "displayText"}>
+            The Pothole/Potholes have been detected. Submitted potholes will be
+            reported to the nearest administration center. <br />
+            Thankyou for your time!
+          </p>
+          {dataVisible && (
+            <>
+              <p>Potholes Detected:-{potholesNum}</p>
+              <p>Latitude:- {lat}</p>
+              <p>Longitude:- {long}</p>
+            </>
+          )}
+        </div>
 
         <button
           className={startButton ? "webButton" : "hideDisplay"}
